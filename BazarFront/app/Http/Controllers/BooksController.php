@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 
@@ -44,22 +43,27 @@ class BooksController extends Controller
        if($command[0]=="search"){
        
        $Request='http://192.168.209.134/search/'.$data;
+$res= $client->request('GET',  $Request);
+ 
                 
 
         }else if($command[0]=="lookup"){
                $Request='http://192.168.209.134/lookup/'.$data;
+$res= $client->request('GET',  $Request);
+ 
 
         }
         else if($command[0]=="buy"){
                $Request='http://192.168.209.131/buy/'.$data;
+$res= $client->request('POST',  $Request);
+ 
 
         }
         else{
         return view('greeting', ['result' => "Try again,command not found"]);
         }
 
-  $res= $client->request('GET',  $Request);
- 
+   
     if ($res->getStatusCode() == 200) { 
             return view('greeting', ['result' =>  $res->getBody()]);
 
