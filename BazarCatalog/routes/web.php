@@ -17,9 +17,10 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
+
+
+
 $router->get('/search/{topic}', ['uses' => 'BooksController@showBasedOnTopic']);
 $router->get('/lookup/{itemNumber}', ['uses' => 'BooksController@showBasedOnItemNumber']);
 $router->get('/query/{itemNumber}', ['uses' => 'BooksController@checkIfExists']);
 $router->get('/update/{itemNumber}', ['uses' => 'BooksController@updateStore']);
-
-
