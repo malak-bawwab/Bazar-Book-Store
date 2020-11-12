@@ -23,4 +23,6 @@ $router->get('/', function () use ($router) {
 $router->get('/search/{topic}', ['uses' => 'BooksController@showBasedOnTopic']);
 $router->get('/lookup/{itemNumber}', ['uses' => 'BooksController@showBasedOnItemNumber']);
 $router->get('/query/{itemNumber}', ['uses' => 'BooksController@checkIfExists']);
-$router->get('/update/{itemNumber}', ['uses' => 'BooksController@updateStore']);
+$router->put('/update/{itemNumber}', ['uses' => 'BooksController@updateStore']);
+
+
