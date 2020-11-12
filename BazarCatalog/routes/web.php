@@ -18,4 +18,5 @@ $router->get('/', function () use ($router) {
 });
 
 $router->get('/search/{topic}', ['uses' => 'BooksController@showBasedOnTopic']);
+$router->get('/lookup/{itemNumber}', ['uses' => 'BooksController@showBasedOnItemNumber']);
 
