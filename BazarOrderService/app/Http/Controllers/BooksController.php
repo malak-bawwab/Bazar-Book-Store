@@ -27,7 +27,7 @@ $array = json_decode($res->getBody()->getContents(), true);
 if($array["message"]=="Found,Not out of stock"){
   $updateRequest='http://192.168.209.134/update/'.$itemNumber;
      
-   $updateRes= $client->request('GET',$updateRequest);
+   $updateRes= $client->request('PUT',$updateRequest);
   return  $updateRes->getBody();
 }elseif($array["message"]=="Found  but out of stock"){
  return   "Buy faild,book is out of stock";
