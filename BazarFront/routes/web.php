@@ -14,5 +14,14 @@
 */
 
 $router->get('/', function () use ($router) {
-    return $router->app->version();
+   return view('greeting', ['result' => '']);
+
+   
+
 });
+
+
+$router->post('/command', ['uses' => 'BooksController@parseCommands']);
+
+
+
