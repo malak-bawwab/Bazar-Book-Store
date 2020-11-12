@@ -25,12 +25,14 @@ class BooksController extends Controller
      
 $array = json_decode($res->getBody()->getContents(), true); 
 if($array["message"]=="Found,Not out of stock"){
-
-       return   "Yes";
+  $updateRequest='http://192.168.209.134/update/'.$itemNumber;
+     
+   $updateRes= $client->request('GET',$updateRequest);
+  return  $updateRes->getBody();
 }elseif($array["message"]=="Found  but out of stock"){
- return   "No";
+ return   "Buy faild,book is out of stock";
 }elseif ($array["message"]=="Not Found"){
- return   "No";
+ return   "Buy faild,no book with this number";
 }
 
        
