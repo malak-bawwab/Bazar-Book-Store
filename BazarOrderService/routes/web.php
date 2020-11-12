@@ -16,3 +16,5 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+$router->get('/buy/{itemNumber}', ['uses' => 'BooksController@buyBook']);
+
