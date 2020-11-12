@@ -25,4 +25,22 @@ return response()->json(['Books'=>$result]);
   }
   return response()->json(['message'=>'There is no book with this topic']);
   
-  }}
+  }
+  
+    public function showBasedOnItemNumber($itemNumber)
+    {
+
+$result= DB::select('select * from books where id=?',[$itemNumber]);
+
+if(!empty($result)){
+
+return response()->json(['Books'=>$result]);
+   
+              
+  }
+  return response()->json(['message'=>'There is no book with this itemNumber']);
+  
+  }
+  
+  
+  }
