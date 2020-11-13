@@ -22,7 +22,7 @@ return response()->json(['Books'=>$result]);
    
               
   }
-  return response()->json(['message'=>'There is no book with this topic']);
+  return response()->json(['message'=>'Try again,There is no book with this topic'.' '.$topic]);
   
   }
   
@@ -37,7 +37,7 @@ return response()->json(['Book'=>$result]);
    
               
   }
-  return response()->json(['message'=>'There is no book with this itemNumber']);
+  return response()->json(['message'=>'Try again,There is no book with this itemNumber'.' '.$itemNumber]);
   
   }
     public function checkIfExists($itemNumber)
@@ -88,11 +88,11 @@ if(!empty($result)){
 
 
 
-  return response()->json(['message'=>"updated Successfully"]);
+  return response()->json(['message'=>"Book".'('.$result[0]->title.')'."Cost is updated Successfully"." From".' '.$result[0]->price.' '."To ".$newCost]);
    }else{
 
 
-return response()->json(['message'=>"Book Not Found"]);
+return response()->json(['message'=>"Book(with this itemNumber".$itemNumber.')'." Not Found"]);
 
 }
 } 
@@ -105,13 +105,15 @@ if(!empty($result)){
 $quantity=$result[0]->quantity+$numberOfItems;
     $result1=DB::update('update books set quantity = '  .$quantity. ' where id= ?' ,[$itemNumber]);
 
-  return response()->json(['message'=>"updated Successfully"]);
+    return response()->json(['message'=>"Book".'('.$result[0]->title.')'."Quantity is updated Successfully"." From".' '.$result[0]->quantity.' '."To ".$quantity]);
+
    }else{
 
 
-return response()->json(['message'=>"Book Not Found"]);
+return response()->json(['message'=>"Book(with this itemNumber".$itemNumber.')'." Not Found"]);
 
-}
+
+}  
 
   }
 public function  decreaseQuantity($itemNumber,$numberOfItems)
@@ -123,7 +125,8 @@ if(!empty($result)){
 $quantity=$result[0]->quantity-$numberOfItems;
 if($quantity>=0){
     $result1=DB::update('update books set quantity = '  .$quantity. ' where id= ?' ,[$itemNumber]);
-  return response()->json(['message'=>"updated Successfully"]);
+ return response()->json(['message'=>"Book".'('.$result[0]->title.')'."Quantity is updated Successfully"." From".' '.$result[0]->quantity.' '."To ".$quantity]);
+
 }else{
 return response()->json(['message'=>"You only have".' '.$result[0]->quantity]);
 
@@ -132,8 +135,7 @@ return response()->json(['message'=>"You only have".' '.$result[0]->quantity]);
   }else{
 
 
-return response()->json(['message'=>"Book Not Found"]);
-
+return response()->json(['message'=>"Book(with this itemNumber".$itemNumber.')'." Not Found"]);
 }
 
   }
