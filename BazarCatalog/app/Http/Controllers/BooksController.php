@@ -33,7 +33,7 @@ $result= DB::select('select * from books where id=?',[$itemNumber]);
 
 if(!empty($result)){
 
-return response()->json(['Books'=>$result]);
+return response()->json(['Book'=>$result]);
    
               
   }
@@ -63,7 +63,9 @@ return response()->json(['Books'=>$result]);
     {
     
     $result1= DB::select('select * from books where id=?',[$itemNumber]);
-    $quantity=$result1[0]->quantity -1;
+
+    $quantity=$result1[0]->quantity-1;
+
     $result2=DB::update('update books set quantity = '  .$quantity. ' where id= ?' ,[$itemNumber]);
 
 
@@ -73,4 +75,67 @@ return response()->json(['Books'=>$result]);
  
  
   
-  }}
+  }
+   
+  public function  updateCost($itemNumber,$newCost)
+    {
+    $result= DB::select('select * from books where id=?',[$itemNumber]);
+
+if(!empty($result)){
+
+
+    $result1=DB::update('update books set price = '  .$newCost. ' where id= ?' ,[$itemNumber]);
+
+
+
+  return response()->json(['message'=>"updated Successfully"]);
+   }else{
+
+
+return response()->json(['message'=>"Book Not Found"]);
+
+}
+} 
+  public function  increaseQuantity($itemNumber,$numberOfItems)
+    {
+    $result= DB::select('select * from books where id=?',[$itemNumber]);
+
+if(!empty($result)){
+
+$quantity=$result[0]->quantity+$numberOfItems;
+    $result1=DB::update('update books set quantity = '  .$quantity. ' where id= ?' ,[$itemNumber]);
+
+  return response()->json(['message'=>"updated Successfully"]);
+   }else{
+
+
+return response()->json(['message'=>"Book Not Found"]);
+
+}
+
+  }
+public function  decreaseQuantity($itemNumber,$numberOfItems)
+    {
+    $result= DB::select('select * from books where id=?',[$itemNumber]);
+
+if(!empty($result)){
+
+$quantity=$result[0]->quantity-$numberOfItems;
+if($quantity>=0){
+    $result1=DB::update('update books set quantity = '  .$quantity. ' where id= ?' ,[$itemNumber]);
+  return response()->json(['message'=>"updated Successfully"]);
+}else{
+return response()->json(['message'=>"You only have".' '.$result[0]->quantity]);
+
+} 
+
+  }else{
+
+
+return response()->json(['message'=>"Book Not Found"]);
+
+}
+
+  }
+
+}
