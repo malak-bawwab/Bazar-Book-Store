@@ -54,9 +54,10 @@ $res= $client->request('GET',  $Request);
 
         }
         else if($command[0]=="buy"){
-               $Request='http://192.168.209.131/buy/'.$data;
+  $Request='http://192.168.209.131/buy/'.$data;
 $res= $client->request('POST',  $Request);
- 
+
+
 
         }
         else{
@@ -67,10 +68,41 @@ $res= $client->request('POST',  $Request);
     if ($res->getStatusCode() == 200) { 
             return view('greeting', ['result' =>  $res->getBody()]);
 
-     }
+   }
+}
+
+    public function searchBasedOnTopic($topic)
+    {
+  $client = new Client();
+       
+      
+       $Request='http://192.168.209.134/search/'.$topic;
+$res= $client->request('GET',  $Request);
+return $res->getBody();
+
+}
+
+  public function lookupBasedOnNumber($itemNumber)
+    {
+  $client = new Client();
+
+         
+       $Request='http://192.168.209.134/lookup/'.$itemNumber;
+$res= $client->request('GET',  $Request);
+return $res->getBody();
 
 
 }
 
-}
+  public function buyBasedOnNumber($itemNumber)
+    {
+  $client = new Client();
 
+         
+       $Request='http://192.168.209.131/buy/'.$itemNumber;
+$res= $client->request('POST',  $Request);
+return $res->getBody();
+
+
+}
+}
