@@ -20,7 +20,7 @@ $router->get('/', function () use ($router) {
 
 });
 
-
+//to parse enterd commands from GUI
 $router->post('/command', ['uses' => 'BooksController@parseCommands']);
 
 
