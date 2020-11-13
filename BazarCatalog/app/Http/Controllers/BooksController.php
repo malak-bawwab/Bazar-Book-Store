@@ -10,9 +10,10 @@ use Illuminate\Support\Facades\DB;
 class BooksController extends Controller
 {
 
-
+//search for a book in books table based on topic
     public function showBasedOnTopic($topic)
     {
+//covert %20 to spaces
 $topic = str_replace('%20',' ',$topic);
 $result= DB::select('select * from books where topic=?',[$topic]);
 
@@ -22,10 +23,10 @@ return response()->json($result);
    
               
   }
-  return response()->json(['message'=>'Try again,There is no book with this topic'.' '.$topic]);
+  return response()->json('Try again,There is no book with this topic'.' '.$topic);
   
   }
-  
+  //search for a book in books table based on the itemNumber
     public function showBasedOnItemNumber($itemNumber)
     {
 
@@ -37,9 +38,13 @@ return response()->json($result);
    
               
   }
-  return response()->json(['message'=>'Try again,There is no book with this itemNumber'.' '.$itemNumber]);
+  return response()->json('Try again,There is no book with this itemNumber'.' '.$itemNumber);
   
   }
+/* check
+if the book exists or not,out of stock or not,it is called by order service
+through Guzzle http client in buy operation.
+*/
     public function checkIfExists($itemNumber)
     {
     
@@ -59,6 +64,9 @@ return response()->json($result);
 
   
   }
+/*decreases the quantity by one(buy operation is successful).It is called in
+buy operation(order service) after making sure
+that the book exists and not out of stock due to query request above.*/
     public function  updateStore($itemNumber)
     {
     

@@ -22,7 +22,10 @@ $router->get('/', function () use ($router) {
 
 $router->get('/search/{topic}', ['uses' => 'BooksController@showBasedOnTopic']);
 $router->get('/lookup/{itemNumber}', ['uses' => 'BooksController@showBasedOnItemNumber']);
+
+// to complete buy process,will be called from order service
 $router->get('/query/{itemNumber}', ['uses' => 'BooksController@checkIfExists']);
+// to complete buy process,will be called from order service
 $router->put('/update/{itemNumber}', ['uses' => 'BooksController@updateStore']);
 
 $router->put('/update/book/{itemNumber}/cost/{newCost}', ['uses' => 'BooksController@updateCost']);
