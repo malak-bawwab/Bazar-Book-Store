@@ -32,7 +32,7 @@ if($array["message"]=="Found,Not out of stock"){
 }elseif($array["message"]=="Found  but out of stock"){
  return   "Buy faild,book is out of stock";
 }elseif ($array["message"]=="Not Found"){
- return   "Buy faild,no book with this number";
+ return   "Buy faild,no book with this number".' '.$itemNumber;
 }
 
        
