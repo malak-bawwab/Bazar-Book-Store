@@ -1,0 +1,40 @@
+https://www.howtoforge.com/tutorial/install-laravel-on-ubuntu-for-apache/
+steps:-
+sudo apt-get install php
+sudo apt-get install php-xml
+sudo apt-get update # Update your system
+sudo apt-get install php-sqlite3 # Install extension
+sudo apt-get install php-openssl
+sudo apt-get install php-mbstring
+
+sudo apt install curl
+curl -sS https://getcomposer.org/installer | php
+sudo mv composer.phar /usr/local/bin/composer
+composer global require laravel/installer
+_____________________
+composer create-project --prefer-dist laravel/lumen <projectname>
+composer require guzzlehttp/guzzle:^7.0
+sudo mv <projectname> /var/www/html/
+sudo chown -R www-data:www-data /var/www/b<projectname>
+sudo chmod -R 775 /var/www/<projectname>/storage
+cd /etc/apache2/sites-available/
+vim laravel.conf:
+<VirtualHost *:80>
+    ServerName <serverIp>
+
+    ServerAdmin admin@<serverIp>
+    DocumentRoot /var/www/<projectname>/public
+
+    <Directory /var/www/b<projectname>
+    Options Indexes MultiViews
+    AllowOverride None
+    Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+
+sudo a2enmod rewrite
+sudo a2ensite laravel.conf
+systemctl restart apache2
