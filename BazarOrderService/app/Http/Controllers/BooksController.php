@@ -16,7 +16,9 @@ class BooksController extends Controller
     public function buyBook($itemNumber)
     {
     $client = new Client();
-       
+/*to catalog, check if
+the book exists on the store and is not out of sock(there are items available
+to buy)*/       
         $queryRequest='http://192.168.209.134/query/'.$itemNumber;
      
    $res= $client->request('GET',  $queryRequest);
@@ -26,10 +28,12 @@ class BooksController extends Controller
 $array = json_decode($res->getBody()->getContents(), true); 
 if($array["message"]=="Found,Not out of stock"){
  
-
+/*to catalog,decrease the quantity of the book by
+1(buy operation is successful).*/
  $updateRequest='http://192.168.209.134/update/'.$itemNumber;
    
    $updateRes= $client->request('PUT',$updateRequest);
+//insert order in orders table 
     DB::insert('insert into orders (bookId,customerName,date) values(?,?,?)',[$itemNumber,"malak Bawwab",date("Y-m-d H:i:s")
 ]);
 
@@ -43,7 +47,7 @@ if($array["message"]=="Found,Not out of stock"){
        
        }
 }
-
+/* return a list for all the received orders of the book with this itemNumber.*/
  public function showAllOrders($itemNumber)
     {
 $result= DB::select('select * from orders where bookId=?',[$itemNumber]);
@@ -53,7 +57,7 @@ $result= DB::select('select * from orders where bookId=?',[$itemNumber]);
 return response()->json($result);
 }else{
 
-return "l";
+return  response()->json("book with this itemNumber ".$itemNumber." Not Found");
 }
 
 
