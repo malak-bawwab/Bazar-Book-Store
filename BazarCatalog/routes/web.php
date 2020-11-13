@@ -25,4 +25,8 @@ $router->get('/lookup/{itemNumber}', ['uses' => 'BooksController@showBasedOnItem
 $router->get('/query/{itemNumber}', ['uses' => 'BooksController@checkIfExists']);
 $router->put('/update/{itemNumber}', ['uses' => 'BooksController@updateStore']);
 
+$router->put('/update/book/{itemNumber}/cost/{newCost}', ['uses' => 'BooksController@updateCost']);
+$router->put('/increase/book/{itemNumber}/quantity/{numberOfItems}', ['uses' => 'BooksController@increaseQuantity']);
+$router->put('/decrease/book/{itemNumber}/quantity/{numberOfItems}', ['uses' => 'BooksController@decreaseQuantity']);
+
 
