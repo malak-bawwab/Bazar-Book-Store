@@ -6,15 +6,20 @@ use Illuminate\Http\Request;
 
 use GuzzleHttp\Client;
 use Cache;
-
+static $x=9;
 
 
 class BooksController extends Controller
 {
+  
+//2 catalog:main1,replica1=2
+//round-robin
 
 //parse the entered commands that comes from GUI(greeting.php)
     public function parseCommands(Request $request)
     {
+
+
         //for example,bodyContent is command=search+distributed+systems
         $bodyContent = $request->getContent();
         
@@ -81,7 +86,19 @@ $res= $client->request('POST',  $Request);
    }
 }
 
+public function checkReplicaTurn(){
+$state;
+if (Cache::has("CatalogloadBalance")){
+$state=Cache::get("CatalogloadBalance");
+}else{
 
+$state=1;
+Cache::set("CatalogloadBalance",1);
+}
+
+return $state;
+
+}
     public function searchBasedOnTopic($topic)    {
 
 $client = new Client();
@@ -94,7 +111,19 @@ return($f);}
 else{
 $oldTopic = str_replace('-',' ',$topic);
 //send to catalog      
+
+$state=$this->checkReplicaTurn();
+if($state==1){
+Cache::set("CatalogloadBalance",2);
 $Request='http://192.168.164.129/search/'.$oldTopic;
+
+}else{
+$state=1;
+Cache::set("CatalogloadBalance",1);
+$Request='http://192.168.164.132/search/'.$oldTopic;
+
+}
+
 $res= $client->request('GET',  $Request);
      //to return json response
 $x=json_decode($res->getBody(),true);
@@ -107,27 +136,28 @@ return $x;
 
   public function lookupBasedOnNumber($itemNumber)
     {
+//Round Robin
 
 if(Cache::has($itemNumber)){
 return Cache::get($itemNumber);
 }else{
-$client = new Client();
 
-//send to catalog
+$state=$this->checkReplicaTurn();
+if($state==1){
+Cache::set("CatalogloadBalance",2);
 $Request='http://192.168.164.129/lookup/'.$itemNumber;
+}else{
+$state=1;
+Cache::set("CatalogloadBalance",1);
+$Request='http://192.168.164.132/lookup/'.$itemNumber;
+
+
+}
+$client = new Client();
+//send to catalog
 $res= $client->request('GET',  $Request);
 $x=json_decode($res->getBody(),true);
 Cache::put($itemNumber,$x);
-/*if($x!="Try again,There is no book with this itemNumber ".$itemNumber){
-
-if($x[0]["topic"]){
-$topic = str_replace(' ','-',$x[0]["topic"]);
-Cache::put($topic,$itemNumber);
-}
- }*/
-
-
-
 return $x;
 }
 }
