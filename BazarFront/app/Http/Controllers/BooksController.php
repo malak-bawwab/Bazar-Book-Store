@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use GuzzleHttp\Client;
+use Cache;
 
 
 
@@ -42,21 +43,25 @@ class BooksController extends Controller
 
        if($command[0]=="search"){
        //send to catalog
-       $Request='http://192.168.209.134/search/'.$data;
+       $Request='http://192.168.164.129/search/'.$data;
 $res= $client->request('GET',  $Request);
  
                 
 
         }else if($command[0]=="lookup"){
 //send to catalog
-               $Request='http://192.168.209.134/lookup/'.$data;
+
+
+
+  $Request='http://192.168.164.129/lookup/'.$data;
+
 $res= $client->request('GET',  $Request);
  
 
         }
         else if($command[0]=="buy"){
 //send to order
-  $Request='http://192.168.209.131/buy/'.$data;
+  $Request='http://192.168.164.130/buy/'.$data;
 $res= $client->request('POST',  $Request);
 
 
@@ -67,33 +72,64 @@ $res= $client->request('POST',  $Request);
         }
 
    
-    if ($res->getStatusCode() == 200) { 
-            return view('greeting', ['result' =>  $res->getBody()]);
+    if ($res->getStatusCode() == 200) {
+
+ 
+         
+ return view('greeting', ['result' =>  $res->getBody()]);
 
    }
 }
 
-    public function searchBasedOnTopic($topic)
-    {
-  $client = new Client();
-       
+
+    public function searchBasedOnTopic($topic)    {
+
+$client = new Client();
+$topic = str_replace('%20','-',$topic);
+if(Cache::has($topic)){
+$f=Cache::get($topic);
+return($f);}
+
+//return Cache::getMemcached()->getAllKeys();
+else{
+$oldTopic = str_replace('-',' ',$topic);
 //send to catalog      
-       $Request='http://192.168.209.134/search/'.$topic;
+$Request='http://192.168.164.129/search/'.$oldTopic;
 $res= $client->request('GET',  $Request);
      //to return json response
-return json_decode($res->getBody());
-  
+$x=json_decode($res->getBody(),true);
 
+Cache::put($topic,$x);
 }
+return $x;
+}
+
 
   public function lookupBasedOnNumber($itemNumber)
     {
-  $client = new Client();
 
-         //send to catalog
-       $Request='http://192.168.209.134/lookup/'.$itemNumber;
+if(Cache::has($itemNumber)){
+return Cache::get($itemNumber);
+}else{
+$client = new Client();
+
+//send to catalog
+$Request='http://192.168.164.129/lookup/'.$itemNumber;
 $res= $client->request('GET',  $Request);
-       return json_decode($res->getBody());
+$x=json_decode($res->getBody(),true);
+Cache::put($itemNumber,$x);
+/*if($x!="Try again,There is no book with this itemNumber ".$itemNumber){
+
+if($x[0]["topic"]){
+$topic = str_replace(' ','-',$x[0]["topic"]);
+Cache::put($topic,$itemNumber);
+}
+ }*/
+
+
+
+return $x;
+}
 }
 
   public function buyBasedOnNumber($itemNumber)
@@ -101,7 +137,7 @@ $res= $client->request('GET',  $Request);
   $client = new Client();
 
          //send to order
-       $Request='http://192.168.209.131/buy/'.$itemNumber;
+       $Request='http://192.168.164.130/buy/'.$itemNumber;
 $res= $client->request('POST',  $Request);
 return $res->getBody();
 
