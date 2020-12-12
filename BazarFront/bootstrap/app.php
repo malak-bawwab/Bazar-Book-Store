@@ -22,10 +22,10 @@ date_default_timezone_set(env('APP_TIMEZONE', 'UTC'));
 $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
+ $app->withFacades();
 
-// $app->withFacades();
 
-// $app->withEloquent();
+ $app->withEloquent();
 
 /*
 |--------------------------------------------------------------------------
@@ -59,8 +59,7 @@ $app->singleton(
 |
 */
 
-$app->configure('app');
-
+$app->configure('app'); 
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -95,6 +94,9 @@ $app->configure('app');
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 
+
+//config(['database.redis'=> [ 'cluster' => env('REDIS_CLUSTER', false), 'default' => [ 'host' => env('REDIS_HOST', '127.0.0.1'), 'port' => env('REDIS_PORT', 6379), 'database' => env('REDIS_DATABASE', 0), 'password' => env('REDIS_PASSWORD', null), ], ]]);
+//$app->register(Illuminate\Redis\RedisServiceProvider::class);
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes
