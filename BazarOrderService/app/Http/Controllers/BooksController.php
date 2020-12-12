@@ -19,7 +19,13 @@ class BooksController extends Controller
 /*to catalog, check if
 the book exists on the store and is not out of sock(there are items available
 to buy)*/       
-        $queryRequest='http://192.168.209.134/query/'.$itemNumber;
+$invalidateRequest='http://192.168.164.128/invalidate/'.$itemNumber;
+ $res1= $client->request('GET',  $invalidateRequest);
+   
+    if ($res1->getStatusCode() == 200) { // 200 OK
+
+
+        $queryRequest='http://192.168.164.129/query/'.$itemNumber;
      
    $res= $client->request('GET',  $queryRequest);
    
@@ -30,7 +36,7 @@ if($array["message"]=="Found,Not out of stock"){
  
 /*to catalog,decrease the quantity of the book by
 1(buy operation is successful).*/
- $updateRequest='http://192.168.209.134/update/'.$itemNumber;
+ $updateRequest='http://192.168.164.128/update/'.$itemNumber;
    
    $updateRes= $client->request('PUT',$updateRequest);
 //insert order in orders table 
@@ -45,7 +51,7 @@ if($array["message"]=="Found,Not out of stock"){
 }
 
        
-       }
+       }}
 }
 /* return a list for all the received orders of the book with this itemNumber.*/
  public function showAllOrders($itemNumber)
@@ -64,3 +70,4 @@ return  response()->json("book with this itemNumber ".$itemNumber." Not Found");
 
 }
 }
+
