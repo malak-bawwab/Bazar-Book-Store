@@ -11,7 +11,27 @@ use GuzzleHttp\Client;
 
 class BooksController extends Controller
 {
+public function updateOrdersAndNotify($itemNumber){
+$res=$this->buyBook($itemNumber);
+if(strpos($res,"Buy faild")){
+}else{
 
+ $this->sendUpdateNotification($itemNumber);}
+return $res;
+
+}
+public function sendUpdateNotification($itemNumber){
+  
+ $client = new Client();
+$notifyRequest='http://192.168.164.131/notify/'.$itemNumber;
+ $res1= $client->request('GET',  $notifyRequest);
+   
+    return $res1->getStatusCode();
+}
+public function applyUpdates($itemNumber){
+DB::insert('insert into orders (bookId,customerName,date) values(?,?,?)',[$itemNumber,"malak Bawwab",date("Y-m-d H:i:s")]);
+
+}
 
     public function buyBook($itemNumber)
     {
