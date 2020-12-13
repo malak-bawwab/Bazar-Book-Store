@@ -11,6 +11,28 @@ use GuzzleHttp\Client;
 class BooksController extends Controller
 {
 
+
+
+public function updateCostAndNotify($itemNumber,$newCost){
+$res=$this->updateCost($itemNumber,$newCost);
+if(strpos($res,"Not Found")){
+}else{
+
+ $this->sendUpdateNotification($itemNumber,"cost",$newCost);
+}
+
+return $res;
+}
+
+public function updateAndNotify($itemNumber,$type,$value){
+$res=$this->updateStoreQuantity($itemNumber,$type,$value);
+if(strpos($res,"Not Found") || strpos($res,"You only have")){
+}else{
+
+ $this->sendUpdateNotification($itemNumber,$type,$value);
+}
+return $res;
+}
 //search for a book in books table based on topic
     public function showBasedOnTopic($topic)
     {
@@ -42,21 +64,34 @@ return response()->json($result);
   }
 /* send inavlidate request to front node ,to invalidate item(remove item from cache).
 */
-public function sendInvalidateRequest($itemNumber){
+public function sendInvalidateRequest($itemNumber,$topic){
     $client = new Client();
-$invalidateRequest='http://192.168.164.128/invalidate/'.$itemNumber;
+$invalidateRequest='http://192.168.164.128/invalidate/'.$itemNumber.'/'.$topic;
  $res1= $client->request('GET',  $invalidateRequest);
    
-    return $res1->getStatusCode();
+        return $res1->getStatusCode();
+
 }
 
 //send update notification to replicas,replica1
 public function sendUpdateNotification($itemNumber,$updateType,$newValue){
-    $client = new Client();
+  
+ $client = new Client();
 $notifyRequest='http://192.168.164.132/notify/'.$itemNumber.'/'.$updateType.'/'.$newValue;
  $res1= $client->request('GET',  $notifyRequest);
    
     return $res1->getStatusCode();
+}
+
+public function applyUpdates($itemNumber,$updateType,$newValue){
+
+if($updateType=="cost"){
+$this->updateCost($itemNumber,$newValue);
+}else {
+
+ $this->updateStoreQuantity($itemNumber,$updateType,$newValue);
+}
+
 }
 
 
@@ -84,26 +119,6 @@ through Guzzle http client in buy operation.
 
   
   }
-/*decreases the quantity by one(buy operation is successful).It is called in
-buy operation(order service) after making sure
-that the book exists and not out of stock due to query request above.*/
-   /* public function  updateStore($itemNumber)
-    {
-    
-    $result1= DB::select('select * from books where id=?',[$itemNumber]);
-
-    $quantity=$result1[0]->quantity-1;
-
-    $result2=DB::update('update books set quantity = '  .$quantity. ' where id= ?' ,[$itemNumber]);
-
-
-
-  return response()->json(['message'=>'Bought book'.' '.$result1[0]->title]);
-   
- 
- 
-  
-  }*/
    
   public function  updateCost($itemNumber,$newCost)
     {
@@ -113,8 +128,7 @@ if(!empty($result)){
 
     
     $result1=DB::update('update books set price = '  .$newCost. ' where id= ?' ,[$itemNumber]);
-  
-    if ($this->sendInvalidateRequest($itemNumber) == 200) { // 200 OK
+   if ($this->sendInvalidateRequest($itemNumber,$result[0]->topic) == 200) { // 200 OK
 
 
 $this->sendUpdateNotification($itemNumber,"cost",$newCost);
@@ -127,60 +141,7 @@ return response()->json(['message'=>"Book(with this itemNumber".$itemNumber.')'.
 
 }
 } 
- /* public function  increaseQuantity($itemNumber,$numberOfItems)
-    {
-    $result= DB::select('select * from books where id=?',[$itemNumber]);
-
-if(!empty($result)){
-    
-$quantity=$result[0]->quantity+$numberOfItems;
-    $result1=DB::update('update books set quantity = '  .$quantity. ' where id= ?' ,[$itemNumber]);
-
-    if ($this->sendInvalidateRequest($itemNumber) == 200) {
-
-$this->sendUpdateNotification($itemNumber,"incQuantity",$numberOfItems);
  
-    return response()->json(['message'=>"Book".'('.$result[0]->title.')'."Quantity is updated Successfully"." From".' '.$result[0]->quantity.' '."To ".$quantity]);
-
-}   }else{
-
-
-return response()->json(['message'=>"Book(with this itemNumber".$itemNumber.')'." Not Found"]);
-
-
-}  
-
-  }
-public function  decreaseQuantity($itemNumber,$numberOfItems)
-    {
-    $result= DB::select('select * from books where id=?',[$itemNumber]);
-
-if(!empty($result)){
-
-$quantity=$result[0]->quantity-$numberOfItems;
-if($quantity>=0){
-    $result1=DB::update('update books set quantity = '  .$quantity. ' where id= ?' ,[$itemNumber]);
-if ($this->sendInvalidateRequest($itemNumber) == 200) { 
-
-
-
- return response()->json(['message'=>"Book".'('.$result[0]->title.')'."Quantity is updated Successfully"." From".' '.$result[0]->quantity.' '."To ".$quantity]);
-}
-}else{
-return response()->json(['message'=>"You only have".' '.$result[0]->quantity]);
-
-} 
-
-  }else{
-
-
-return response()->json(['message'=>"Book(with this itemNumber".$itemNumber.')'." Not Found"]);
-}
-
-  }
-
-}
-*/
  public function  updateStoreQuantity($itemNumber,$type,$value){
 $result1= DB::select('select * from books where id=?',[$itemNumber]);
 if($type=="buy"){
@@ -189,7 +150,8 @@ if($quantity<0){
 $quantity=0;
 }
 $result2=DB::update('update books set quantity = '  .$quantity. ' where id= ?' ,[$itemNumber]);
-    $this->sendInvalidateRequest($itemNumber);
+    $this->sendInvalidateRequest($itemNumber,$result1[0]->topic);
+
 return response()->json(['message'=>'Bought book'.' '.$result1[0]->title]);
 
 }else if(!empty($result1)){
@@ -214,9 +176,8 @@ return response()->json(['message'=>"You only have".' '.$result1[0]->quantity]);
 
 }else{
 $result2=DB::update('update books set quantity = '  .$quantity. ' where id= ?' ,[$itemNumber]);
-    $this->sendInvalidateRequest($itemNumber);
-
- return response()->json(['message'=>"Book".'('.$result1[0]->title.')'."Quantity is updated Successfully from".$result1[0]->quantity." to ".$quantity
+    $this->sendInvalidateRequest($itemNumber,$result1[0]->topic);
+  return response()->json(['message'=>"Book".'('.$result1[0]->title.')'."Quantity is updated Successfully from".$result1[0]->quantity." to ".$quantity
 ]);
 
 }
