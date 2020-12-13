@@ -14,7 +14,8 @@
 */
 
 $router->get('/', function () use ($router) {
-   return view('greeting', ['result' => '']);
+
+ return view('greeting', ['result' => '']);
 
    
 
@@ -24,7 +25,7 @@ $router->get('/', function () use ($router) {
 $router->post('/command', ['uses' => 'BooksController@parseCommands']);
 
 
-
+$router->get('/invalidate/{itemNumber}', ['uses' => 'BooksController@invalidateData']);
 $router->get('/search/topic/{topic}', ['uses' => 'BooksController@searchBasedOnTopic']);
 $router->get('/lookup/number/{itemNumber}', ['uses' => 'BooksController@lookupBasedOnNumber']);
 $router->post('/buy/number/{itemNumber}', ['uses' => 'BooksController@buyBasedOnNumber']);
