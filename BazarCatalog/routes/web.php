@@ -16,16 +16,11 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
-
-
-
-
 $router->get('/search/{topic}', ['uses' => 'BooksController@showBasedOnTopic']);
 $router->get('/lookup/{itemNumber}', ['uses' => 'BooksController@showBasedOnItemNumber']);
 
 // to complete buy process,will be called from order service
 $router->get('/query/{itemNumber}', ['uses' => 'BooksController@checkIfExists']);
-/
 
 $router->put('/update/book/{itemNumber}/cost/{newCost}', ['uses' => 'BooksController@updateCost']);
 $router->put('/update/book/{itemNumber}/type/{type}/value/{value}', ['uses' => 'BooksController@updateStoreQuantity']);
