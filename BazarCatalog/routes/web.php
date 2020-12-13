@@ -26,10 +26,9 @@ $router->get('/lookup/{itemNumber}', ['uses' => 'BooksController@showBasedOnItem
 // to complete buy process,will be called from order service
 $router->get('/query/{itemNumber}', ['uses' => 'BooksController@checkIfExists']);
 // to complete buy process,will be called from order service
-$router->put('/update/{itemNumber}', ['uses' => 'BooksController@updateStore']);
+//$router->put('/update/{itemNumber}', ['uses' => 'BooksController@updateStore']);
 
 $router->put('/update/book/{itemNumber}/cost/{newCost}', ['uses' => 'BooksController@updateCost']);
-$router->put('/increase/book/{itemNumber}/quantity/{numberOfItems}', ['uses' => 'BooksController@increaseQuantity']);
-$router->put('/decrease/book/{itemNumber}/quantity/{numberOfItems}', ['uses' => 'BooksController@decreaseQuantity']);
-
+$router->put('/update/book/{itemNumber}/{type}/{value}', ['uses' => 'BooksController@updateStoreQuantity']);
+//$router->put('/decrease/book/{itemNumber}/quantity/{numberOfItems}', ['uses' => 'BooksController@decreaseQuantity']);
 
