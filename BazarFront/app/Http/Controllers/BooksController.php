@@ -43,29 +43,18 @@ class BooksController extends Controller
 
        if($command[0]=="search"){
        //send to catalog
-     //  $Request='http://192.168.164.129/search/'.$data;
-//$res= $client->request('GET',  $Request);
- $res=$this->searchBasedOnTopic($data);
+      $res=$this->searchBasedOnTopic($data);
                  return view('greeting', ['result' => json_encode( $res)]);
 
 
         }else if($command[0]=="lookup"){
-//send to catalog
-
-
-
-  //$Request='http://192.168.164.129/lookup/'.$data;
-
-//$res= $client->request('GET',  $Request);
+//send to catal
 $res= $this->lookupBasedOnNumber($data);
 return $res;
  return view('greeting', ['result' =>  json_encode($res)]);
 
         }
         else if($command[0]=="buy"){
-//send to order
-//  $Request='http://192.168.164.133/buy/'.$data;
-//$res= $client->request('POST',  $Request);
 $res=$this->buyBasedOnNumber($data);
  return view('greeting', ['result' =>  $res]);
 
@@ -95,6 +84,7 @@ return $state;
 public function searchBasedOnTopic($topic)    {
 
 $client = new Client();
+$topic = str_replace(' ','-',$topic);
 $topic = str_replace('%20','-',$topic);
 if(Cache::has($topic)){
 $f=Cache::get($topic);
@@ -124,12 +114,19 @@ return $x;
 }
 
 //inalidate cache data in case of updates
-  public function invalidateData($itemNumber)
+  public function invalidateData($itemNumber,$topic)
     {
+$topic = str_replace('%20','-',$topic);
+
 if(Cache::has($itemNumber)){
 
 
 Cache::delete($itemNumber);
+}
+if(Cache::has($topic)){
+Cache::delete($topic);
+
+
 }
 return Cache::getMemcached()->getAllKeys();
 //return "ok";
