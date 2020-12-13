@@ -31,7 +31,7 @@ if($array["message"]=="Found,Not out of stock"){
  
 /*to catalog,decrease the quantity of the book by
 1(buy operation is successful).*/
- $updateRequest='http://192.168.164.129/update/'.$itemNumber;
+ $updateRequest='http://192.168.164.129/update/'.$itemNumber.'/buy/1';
    
  $updateRes= $client->request('PUT',$updateRequest);
 //insert order in orders table 
