@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use GuzzleHttp\Client;
 
 
 
@@ -93,11 +94,15 @@ if(!empty($result)){
 
 
     $result1=DB::update('update books set price = '  .$newCost. ' where id= ?' ,[$itemNumber]);
+$invalidateRequest='http://192.168.164.128/invalidate/'.$itemNumber;
+ $res1= $client->request('GET',  $invalidateRequest);
+   
+    if ($res1->getStatusCode() == 200) { // 200 OK
 
 
 
   return response()->json(['message'=>"Book".'('.$result[0]->title.')'."Cost is updated Successfully"." From".' '.$result[0]->price.' '."To ".$newCost]);
-   }else{
+}   }else{
 
 
 return response()->json(['message'=>"Book(with this itemNumber".$itemNumber.')'." Not Found"]);
@@ -112,10 +117,14 @@ if(!empty($result)){
 
 $quantity=$result[0]->quantity+$numberOfItems;
     $result1=DB::update('update books set quantity = '  .$quantity. ' where id= ?' ,[$itemNumber]);
+$invalidateRequest='http://192.168.164.128/invalidate/'.$itemNumber;
+ $res1= $client->request('GET',  $invalidateRequest);
+   
+    if ($res1->getStatusCode() == 200) { // 200 OK
 
     return response()->json(['message'=>"Book".'('.$result[0]->title.')'."Quantity is updated Successfully"." From".' '.$result[0]->quantity.' '."To ".$quantity]);
 
-   }else{
+}   }else{
 
 
 return response()->json(['message'=>"Book(with this itemNumber".$itemNumber.')'." Not Found"]);
@@ -133,8 +142,13 @@ if(!empty($result)){
 $quantity=$result[0]->quantity-$numberOfItems;
 if($quantity>=0){
     $result1=DB::update('update books set quantity = '  .$quantity. ' where id= ?' ,[$itemNumber]);
- return response()->json(['message'=>"Book".'('.$result[0]->title.')'."Quantity is updated Successfully"." From".' '.$result[0]->quantity.' '."To ".$quantity]);
+$invalidateRequest='http://192.168.164.128/invalidate/'.$itemNumber;
+ $res1= $client->request('GET',  $invalidateRequest);
+   
+    if ($res1->getStatusCode() == 200) { // 200 OK
 
+ return response()->json(['message'=>"Book".'('.$result[0]->title.')'."Quantity is updated Successfully"." From".' '.$result[0]->quantity.' '."To ".$quantity]);
+}
 }else{
 return response()->json(['message'=>"You only have".' '.$result[0]->quantity]);
 
