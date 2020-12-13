@@ -6,8 +6,6 @@ use Illuminate\Http\Request;
 
 use GuzzleHttp\Client;
 use Cache;
-static $x=9;
-
 
 class BooksController extends Controller
 {
@@ -132,8 +130,16 @@ Cache::put($topic,$x);
 }
 return $x;
 }
+  public function invalidateData($itemNumber)
+    {
+if(Cache::has($itemNumber)){
 
 
+Cache::delete($itemNumber);
+}
+return Cache::getMemcached()->getAllKeys();
+//return "ok";
+}
   public function lookupBasedOnNumber($itemNumber)
     {
 //Round Robin
