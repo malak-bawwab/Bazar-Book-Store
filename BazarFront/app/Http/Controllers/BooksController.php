@@ -12,7 +12,6 @@ class BooksController extends Controller
   
 //2 catalog:main1,replica1=2
 //round-robin
-
 //parse the entered commands that comes from GUI(greeting.php)
     public function parseCommands(Request $request)
     {
@@ -64,7 +63,7 @@ $res= $client->request('GET',  $Request);
         }
         else if($command[0]=="buy"){
 //send to order
-  $Request='http://192.168.164.130/buy/'.$data;
+  $Request='http://192.168.164.133/buy/'.$data;
 $res= $client->request('POST',  $Request);
 
 
@@ -84,14 +83,13 @@ $res= $client->request('POST',  $Request);
    }
 }
 
-public function checkReplicaTurn(){
+public function checkReplicaTurn($name){
 $state;
-if (Cache::has("CatalogloadBalance")){
-$state=Cache::get("CatalogloadBalance");
+if (Cache::has($name)){
+$state=Cache::get($name);
 }else{
-
 $state=1;
-Cache::set("CatalogloadBalance",1);
+Cache::set($name,1);
 }
 
 return $state;
@@ -105,25 +103,22 @@ if(Cache::has($topic)){
 $f=Cache::get($topic);
 return($f);}
 
-//return Cache::getMemcached()->getAllKeys();
 else{
 $oldTopic = str_replace('-',' ',$topic);
-//send to catalog      
-
-$state=$this->checkReplicaTurn();
+$state=$this->checkReplicaTurn("CatalogloadBalance");
 if($state==1){
+//main
 Cache::set("CatalogloadBalance",2);
 $Request='http://192.168.164.129/search/'.$oldTopic;
-
 }else{
+//replica1
 $state=1;
 Cache::set("CatalogloadBalance",1);
 $Request='http://192.168.164.132/search/'.$oldTopic;
-
 }
 
 $res= $client->request('GET',  $Request);
-     //to return json response
+//to return json response
 $x=json_decode($res->getBody(),true);
 
 Cache::put($topic,$x);
@@ -148,11 +143,13 @@ if(Cache::has($itemNumber)){
 return Cache::get($itemNumber);
 }else{
 
-$state=$this->checkReplicaTurn();
+$state=$this->checkReplicaTurn("CatalogloadBalance");
 if($state==1){
+//main
 Cache::set("CatalogloadBalance",2);
 $Request='http://192.168.164.129/lookup/'.$itemNumber;
 }else{
+//replica1
 $state=1;
 Cache::set("CatalogloadBalance",1);
 $Request='http://192.168.164.132/lookup/'.$itemNumber;
@@ -171,9 +168,17 @@ return $x;
   public function buyBasedOnNumber($itemNumber)
     {
   $client = new Client();
-
-         //send to order
-       $Request='http://192.168.164.130/buy/'.$itemNumber;
+$state=$this->checkReplicaTurn("OrderloadBalance");
+if($state==1){
+//main
+Cache::set("OrderloadBalance",2);
+ $Request='http://192.168.164.133/buy/'.$itemNumber;
+}else{
+//replica1
+$state=1;
+Cache::set("OrderloadBalance",1);
+ $Request='http://192.168.164.131/buy/'.$itemNumber;
+}
 $res= $client->request('POST',  $Request);
 return $res->getBody();
 
