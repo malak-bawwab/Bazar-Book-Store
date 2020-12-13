@@ -37,10 +37,6 @@ if($array["message"]=="Found,Not out of stock"){
 //insert order in orders table 
   DB::insert('insert into orders (bookId,customerName,date) values(?,?,?)',[$itemNumber,"malak Bawwab",date("Y-m-d H:i:s")
 ]);
-$invalidateRequest='http://192.168.164.128/invalidate/'.$itemNumber;
- $res1= $client->request('GET',  $invalidateRequest);
-   
-    if ($res1->getStatusCode() == 200) { // 200 OK
 
   return  $updateRes->getBody();
 }
