@@ -46,6 +46,16 @@ return response()->json($result);
 if the book exists or not,out of stock or not,it is called by order service
 through Guzzle http client in buy operation.
 */
+public function sendInvalidateRequest($itemNumber){
+    $client = new Client();
+$invalidateRequest='http://192.168.164.128/invalidate/'.$itemNumber;
+ $res1= $client->request('GET',  $invalidateRequest);
+   
+    return $res1->getStatusCode();
+}
+
+
+
     public function checkIfExists($itemNumber)
     {
     
@@ -92,12 +102,10 @@ that the book exists and not out of stock due to query request above.*/
 
 if(!empty($result)){
 
-
+    
     $result1=DB::update('update books set price = '  .$newCost. ' where id= ?' ,[$itemNumber]);
-$invalidateRequest='http://192.168.164.128/invalidate/'.$itemNumber;
- $res1= $client->request('GET',  $invalidateRequest);
-   
-    if ($res1->getStatusCode() == 200) { // 200 OK
+  
+    if ($this->sendInvalidateRequest($itemNumber) == 200) { // 200 OK
 
 
 
@@ -114,14 +122,11 @@ return response()->json(['message'=>"Book(with this itemNumber".$itemNumber.')'.
     $result= DB::select('select * from books where id=?',[$itemNumber]);
 
 if(!empty($result)){
-
+    
 $quantity=$result[0]->quantity+$numberOfItems;
     $result1=DB::update('update books set quantity = '  .$quantity. ' where id= ?' ,[$itemNumber]);
-$invalidateRequest='http://192.168.164.128/invalidate/'.$itemNumber;
- $res1= $client->request('GET',  $invalidateRequest);
-   
-    if ($res1->getStatusCode() == 200) { // 200 OK
 
+    if ($this->sendInvalidateRequest($itemNumber) == 200) { 
     return response()->json(['message'=>"Book".'('.$result[0]->title.')'."Quantity is updated Successfully"." From".' '.$result[0]->quantity.' '."To ".$quantity]);
 
 }   }else{
@@ -142,11 +147,7 @@ if(!empty($result)){
 $quantity=$result[0]->quantity-$numberOfItems;
 if($quantity>=0){
     $result1=DB::update('update books set quantity = '  .$quantity. ' where id= ?' ,[$itemNumber]);
-$invalidateRequest='http://192.168.164.128/invalidate/'.$itemNumber;
- $res1= $client->request('GET',  $invalidateRequest);
-   
-    if ($res1->getStatusCode() == 200) { // 200 OK
-
+if ($this->sendInvalidateRequest($itemNumber) == 200) { 
  return response()->json(['message'=>"Book".'('.$result[0]->title.')'."Quantity is updated Successfully"." From".' '.$result[0]->quantity.' '."To ".$quantity]);
 }
 }else{
