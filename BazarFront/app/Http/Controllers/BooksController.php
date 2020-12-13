@@ -10,8 +10,6 @@ use Cache;
 class BooksController extends Controller
 {
   
-//2 catalog:main1,replica1=2
-//round-robin
 //parse the entered commands that comes from GUI(greeting.php)
     public function parseCommands(Request $request)
     {
@@ -45,27 +43,31 @@ class BooksController extends Controller
 
        if($command[0]=="search"){
        //send to catalog
-       $Request='http://192.168.164.129/search/'.$data;
-$res= $client->request('GET',  $Request);
- 
-                
+     //  $Request='http://192.168.164.129/search/'.$data;
+//$res= $client->request('GET',  $Request);
+ $res=$this->searchBasedOnTopic($data);
+                 return view('greeting', ['result' => json_encode( $res)]);
+
 
         }else if($command[0]=="lookup"){
 //send to catalog
 
 
 
-  $Request='http://192.168.164.129/lookup/'.$data;
+  //$Request='http://192.168.164.129/lookup/'.$data;
 
-$res= $client->request('GET',  $Request);
- 
+//$res= $client->request('GET',  $Request);
+$res= $this->lookupBasedOnNumber($data);
+return $res;
+ return view('greeting', ['result' =>  json_encode($res)]);
 
         }
         else if($command[0]=="buy"){
 //send to order
-  $Request='http://192.168.164.133/buy/'.$data;
-$res= $client->request('POST',  $Request);
-
+//  $Request='http://192.168.164.133/buy/'.$data;
+//$res= $client->request('POST',  $Request);
+$res=$this->buyBasedOnNumber($data);
+ return view('greeting', ['result' =>  $res]);
 
 
         }
@@ -73,15 +75,9 @@ $res= $client->request('POST',  $Request);
         return view('greeting', ['result' => "Try again,command not found"]);
         }
 
-   
-    if ($res->getStatusCode() == 200) {
-
- 
-         
- return view('greeting', ['result' =>  $res->getBody()]);
-
-   }
+  
 }
+//round-robin load balancing alg
 
 public function checkReplicaTurn($name){
 $state;
@@ -95,7 +91,8 @@ Cache::set($name,1);
 return $state;
 
 }
-    public function searchBasedOnTopic($topic)    {
+
+public function searchBasedOnTopic($topic)    {
 
 $client = new Client();
 $topic = str_replace('%20','-',$topic);
@@ -125,6 +122,8 @@ Cache::put($topic,$x);
 }
 return $x;
 }
+
+//inalidate cache data in case of updates
   public function invalidateData($itemNumber)
     {
 if(Cache::has($itemNumber)){
