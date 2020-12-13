@@ -31,7 +31,7 @@ if($array["message"]=="Found,Not out of stock"){
  
 /*to catalog,decrease the quantity of the book by
 1(buy operation is successful).*/
- $updateRequest='http://192.168.164.129/update/'.$itemNumber.'/buy/1';
+ $updateRequest='http://192.168.164.129/update/book/'.$itemNumber.'/type/buy/value/1';
    
  $updateRes= $client->request('PUT',$updateRequest);
 //insert order in orders table 
@@ -39,7 +39,7 @@ if($array["message"]=="Found,Not out of stock"){
 ]);
 
   return  $updateRes->getBody();
-}
+
 }elseif($array["message"]=="Found  but out of stock"){
  return   "Buy faild,book is out of stock";
 }elseif ($array["message"]=="Not Found"){
@@ -48,7 +48,6 @@ if($array["message"]=="Found,Not out of stock"){
 
        
        }}
-}
 /* return a list for all the received orders of the book with this itemNumber.*/
  public function showAllOrders($itemNumber)
     {
