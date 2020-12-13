@@ -16,6 +16,8 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
-$router->post('/buy/{itemNumber}', ['uses' => 'BooksController@buyBook']);
+$router->get('/notify/{itemNumber}', ['uses' => 'BooksController@applyUpdates']);
+
+$router->post('/buy/{itemNumber}', ['uses' => 'BooksController@updateOrdersAndNotify']);
 $router->get('/list/orders/{itemNumber}', ['uses' => 'BooksController@showAllOrders']);
 
