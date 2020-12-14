@@ -40,14 +40,15 @@ DB::insert('insert into orders (bookId,customerName,date) values(?,?,?)',[$itemN
 the book exists on the store and is not out of sock(there are items available
 to buy)*/       
 
- $queryRequest='http://192.168.164.129/query/'.$itemNumber;
+ $queryRequest='http://192.168.164.128/lookup/number/'.$itemNumber;
      
  $res= $client->request('GET',  $queryRequest);
    
  if ($res->getStatusCode() == 200) { // 200 OK
      
 $array = json_decode($res->getBody()->getContents(), true); 
-if($array["message"]=="Found,Not out of stock"){
+
+if($array!=null && $array[0]["quantity"]>0){
  
 /*to catalog,decrease the quantity of the book by
 1(buy operation is successful).*/
@@ -55,14 +56,14 @@ if($array["message"]=="Found,Not out of stock"){
    
  $updateRes= $client->request('PUT',$updateRequest);
 //insert order in orders table 
-  DB::insert('insert into orders (bookId,customerName,date) values(?,?,?)',[$itemNumber,"malak Bawwab",date("Y-m-d H:i:s")
+  DB::insert('insert into orders (bookId,customerName,date) values(?,?,?)',[$itemNumber,"malak Bawwab",date("Y-m-d")
 ]);
 
   return  $updateRes->getBody();
 
-}elseif($array["message"]=="Found  but out of stock"){
+}elseif($array!=null && $array[0]["quantity"]<=0){
  return   "Buy faild,book is out of stock";
-}elseif ($array["message"]=="Not Found"){
+}else{
  return   "Buy faild,no book with this number".' '.$itemNumber;
 }
 
