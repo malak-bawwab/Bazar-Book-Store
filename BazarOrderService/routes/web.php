@@ -16,6 +16,7 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+//there is an updates from other orders replicas needs to be applied
 $router->get('/notify/{itemNumber}', ['uses' => 'BooksController@applyUpdates']);
 
 $router->post('/buy/{itemNumber}', ['uses' => 'BooksController@updateOrdersAndNotify']);
