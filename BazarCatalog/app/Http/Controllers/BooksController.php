@@ -12,7 +12,7 @@ class BooksController extends Controller
 {
 
 
-
+//when updating cost,do the update and notify other catalog replicas of the update
 public function updateCostAndNotify($itemNumber,$newCost){
 $res=$this->updateCost($itemNumber,$newCost);
 if(strpos($res,"Not Found")){
@@ -23,7 +23,7 @@ if(strpos($res,"Not Found")){
 
 return $res;
 }
-
+//when there is update quantity,do the update and notify other catalog replicas of the new value.
 public function updateAndNotify($itemNumber,$type,$value){
 $res=$this->updateStoreQuantity($itemNumber,$type,$value);
 if(strpos($res,"Not Found") || strpos($res,"You only have")){
@@ -64,6 +64,7 @@ return response()->json($result);
   }
 /* send inavlidate request to front node ,to invalidate item(remove item from cache).
 */
+//in case of updates,send invalidate request to front server that conatins cache,to remove item from the cache.
 public function sendInvalidateRequest($itemNumber,$topic){
     $client = new Client();
 $invalidateRequest='http://192.168.164.128/invalidate/'.$itemNumber.'/'.$topic;
@@ -73,7 +74,7 @@ $invalidateRequest='http://192.168.164.128/invalidate/'.$itemNumber.'/'.$topic;
 
 }
 
-//send update notification to replicas,replica1
+//send update notification to other catalog replicas
 public function sendUpdateNotification($itemNumber,$updateType,$newValue){
   
  $client = new Client();
@@ -82,9 +83,9 @@ $notifyRequest='http://192.168.164.132/notify/'.$itemNumber.'/'.$updateType.'/'.
    
     return $res1->getStatusCode();
 }
-
+//if any updates  are recived from other catalog replicas,apply the updates
 public function applyUpdates($itemNumber,$updateType,$newValue){
-
+//check update type if it is on cost or quantity
 if($updateType=="cost"){
 $this->updateCost($itemNumber,$newValue);
 }else {
@@ -100,26 +101,7 @@ if the book exists or not,out of stock or not,it is called by order service
 through Guzzle http client in buy operation.
 */
 
-    public function checkIfExists($itemNumber)
-    {
-    
-    $result1= DB::select('select * from books where id=?',[$itemNumber]);
- 
-    $result2=DB::select('select * from books where id=? and quantity>0',[$itemNumber]);
-
- if(!empty($result1) && !empty($result2)){
-   return response()->json(['message'=>'Found,Not out of stock']);
- 
- }elseif(!empty($result1) && empty($result2)){
-    return response()->json(['message'=>'Found  but out of stock']);
- }
- elseif(empty($result1)){
-     return response()->json(['message'=>'Not Found']);
- }
-
-  
-  }
-   
+    //do the update and send inavlidate request to front node that contain the cache
   public function  updateCost($itemNumber,$newCost)
     {
     $result= DB::select('select * from books where id=?',[$itemNumber]);
@@ -128,20 +110,17 @@ if(!empty($result)){
 
     
     $result1=DB::update('update books set price = '  .$newCost. ' where id= ?' ,[$itemNumber]);
-   if ($this->sendInvalidateRequest($itemNumber,$result[0]->topic) == 200) { // 200 OK
-
-
-$this->sendUpdateNotification($itemNumber,"cost",$newCost);
+       $this->sendInvalidateRequest($itemNumber,$result[0]->topic);
 
   return response()->json(['message'=>"Book".'('.$result[0]->title.')'."Cost is updated Successfully"." From".' '.$result[0]->price.' '."To ".$newCost]);
-}   }else{
+   }else{
 
 
 return response()->json(['message'=>"Book(with this itemNumber".$itemNumber.')'." Not Found"]);
 
 }
 } 
- 
+ //do the update and send invalidate request to the front node that contain cache
  public function  updateStoreQuantity($itemNumber,$type,$value){
 $result1= DB::select('select * from books where id=?',[$itemNumber]);
 if($type=="buy"){
