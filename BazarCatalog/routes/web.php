@@ -19,8 +19,6 @@ $router->get('/', function () use ($router) {
 $router->get('/search/{topic}', ['uses' => 'BooksController@showBasedOnTopic']);
 $router->get('/lookup/{itemNumber}', ['uses' => 'BooksController@showBasedOnItemNumber']);
 
-// to complete buy process,will be called from order service
-//$router->get('/query/{itemNumber}', ['uses' => 'BooksController@checkIfExists']);
 
 $router->put('/update/book/{itemNumber}/cost/{newCost}', ['uses' => 'BooksController@updateCost']);
 //update quantity(set it to new Value,increase items,decrese items,decrement quantity by 1 in case it is called from order server through buy operation).

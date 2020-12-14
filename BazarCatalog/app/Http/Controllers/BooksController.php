@@ -62,8 +62,7 @@ return response()->json($result);
   return response()->json('Try again,There is no book with this itemNumber'.' '.$itemNumber);
   
   }
-/* send inavlidate request to front node ,to invalidate item(remove item from cache).
-*/
+
 //in case of updates,send invalidate request to front server that conatins cache,to remove item from the cache.
 public function sendInvalidateRequest($itemNumber,$topic){
     $client = new Client();
@@ -96,10 +95,6 @@ $this->updateCost($itemNumber,$newValue);
 }
 
 
-/* check
-if the book exists or not,out of stock or not,it is called by order service
-through Guzzle http client in buy operation.
-*/
 
     //do the update and send inavlidate request to front node that contain the cache
   public function  updateCost($itemNumber,$newCost)
