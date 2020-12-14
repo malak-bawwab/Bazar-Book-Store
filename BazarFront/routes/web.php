@@ -1,5 +1,5 @@
 <?php
-
+use Cache;
 /** @var \Laravel\Lumen\Routing\Router $router */
 
 /*
@@ -14,7 +14,6 @@
 */
 
 $router->get('/', function () use ($router) {
-
  return view('greeting', ['result' => '']);
 
    

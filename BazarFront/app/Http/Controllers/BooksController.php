@@ -50,7 +50,6 @@ class BooksController extends Controller
         }else if($command[0]=="lookup"){
 //send to catal
 $res= $this->lookupBasedOnNumber($data);
-return $res;
  return view('greeting', ['result' =>  json_encode($res)]);
 
         }
@@ -67,7 +66,7 @@ $res=$this->buyBasedOnNumber($data);
   
 }
 //round-robin load balancing alg
-
+//name is either for catalogLoadBalancing ,orderLoadBalancing
 public function checkReplicaTurn($name){
 $state;
 if (Cache::has($name)){
@@ -93,10 +92,12 @@ return($f);}
 else{
 $oldTopic = str_replace('-',' ',$topic);
 $state=$this->checkReplicaTurn("CatalogloadBalance");
+//call the request based on the turn of round-robin alg
 if($state==1){
 //main
 Cache::set("CatalogloadBalance",2);
 $Request='http://192.168.164.129/search/'.$oldTopic;
+
 }else{
 //replica1
 $state=1;
@@ -108,12 +109,12 @@ $res= $client->request('GET',  $Request);
 //to return json response
 $x=json_decode($res->getBody(),true);
 
-Cache::put($topic,$x);
-}
+Cache::put($topic,$x);}
 return $x;
 }
 
 //inalidate cache data in case of updates
+//remove item from cache
   public function invalidateData($itemNumber,$topic)
     {
 $topic = str_replace('%20','-',$topic);
@@ -128,8 +129,8 @@ Cache::delete($topic);
 
 
 }
-return Cache::getMemcached()->getAllKeys();
-//return "ok";
+//return Cache::getMemcached()->getAllKeys();
+return "ok";
 }
   public function lookupBasedOnNumber($itemNumber)
     {
@@ -138,7 +139,7 @@ return Cache::getMemcached()->getAllKeys();
 if(Cache::has($itemNumber)){
 return Cache::get($itemNumber);
 }else{
-
+//call the request based on the round-robin
 $state=$this->checkReplicaTurn("CatalogloadBalance");
 if($state==1){
 //main
@@ -153,7 +154,7 @@ $Request='http://192.168.164.132/lookup/'.$itemNumber;
 
 }
 $client = new Client();
-//send to catalog
+
 $res= $client->request('GET',  $Request);
 $x=json_decode($res->getBody(),true);
 Cache::put($itemNumber,$x);
@@ -168,6 +169,7 @@ $state=$this->checkReplicaTurn("OrderloadBalance");
 if($state==1){
 //main
 Cache::set("OrderloadBalance",2);
+//main
  $Request='http://192.168.164.133/buy/'.$itemNumber;
 }else{
 //replica1
