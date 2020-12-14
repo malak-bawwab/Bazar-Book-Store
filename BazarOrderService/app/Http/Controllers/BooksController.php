@@ -29,7 +29,7 @@ $notifyRequest='http://192.168.164.131/notify/'.$itemNumber;
     return $res1->getStatusCode();
 }
 public function applyUpdates($itemNumber){
-DB::insert('insert into orders (bookId,customerName,date) values(?,?,?)',[$itemNumber,"malak Bawwab",date("Y-m-d H:i:s")]);
+DB::insert('insert into orders (bookId,customerName,date) values(?,?,?)',[$itemNumber,"malak Bawwab",date("Y-m-d")]);
 
 }
 
