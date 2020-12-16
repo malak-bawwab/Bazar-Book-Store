@@ -39,7 +39,7 @@ DB::insert('insert into orders (bookId,customerName,date) values(?,?,?)',[$itemN
     public function buyBook($itemNumber)
     {
     $client = new Client();
-/
+
 //send look request to front node that contains cache,to know if the item exists or not
 $queryRequest='http://192.168.164.128/lookup/number/'.$itemNumber;
      
