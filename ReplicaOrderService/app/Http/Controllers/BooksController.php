@@ -42,9 +42,7 @@ $notifyRequest='http://192.168.164.133/notify/'.$itemNumber;
     public function buyBook($itemNumber)
     {
     $client = new Client();
-/*to catalog, check if
-the book exists on the store and is not out of sock(there are items available
-to buy)*/       
+ 
 
  $queryRequest='http://192.168.164.128/lookup/number/'.$itemNumber;
      
