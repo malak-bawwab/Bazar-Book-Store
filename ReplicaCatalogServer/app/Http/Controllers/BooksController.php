@@ -67,29 +67,8 @@ return response()->json($result);
   return response()->json('Try again,There is no book with this itemNumber'.' '.$itemNumber);
   
   }
-/* check
-if the book exists or not,out of stock or not,it is called by order service
-through Guzzle http client in buy operation.
-*/
-    public function checkIfExists($itemNumber)
-    {
-    
-    $result1= DB::select('select * from books where id=?',[$itemNumber]);
- 
-    $result2=DB::select('select * from books where id=? and quantity>0',[$itemNumber]);
 
- if(!empty($result1) && !empty($result2)){
-   return response()->json(['message'=>'Found,Not out of stock']);
- 
- }elseif(!empty($result1) && empty($result2)){
-    return response()->json(['message'=>'Found  but out of stock']);
- }
- elseif(empty($result1)){
-     return response()->json(['message'=>'Not Found']);
- }
-
-  
-  }
+   
 public function  updateStoreQuantity($itemNumber,$type,$value){
 $result1= DB::select('select * from books where id=?',[$itemNumber]);
 if($type=="buy"){
