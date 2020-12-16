@@ -1,6 +1,5 @@
 <?php
 
-
 /*
 |--------------------------------------------------------------------------
 | Create The Application
@@ -24,6 +23,6 @@ $app = require __DIR__.'/../bootstrap/app.php';
 | the client's browser allowing them to enjoy the creative
 | and wonderful application we have prepared for them.
 |
-*/
- 
+config(['app.timezone' => 'America/Chicago']);
+
 $app->run();

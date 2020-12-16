@@ -1,4 +1,6 @@
 <?php
+use Illuminate\Support\Facades\Config;
+
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -110,5 +112,6 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/web.php';
 });
+
 
 return $app;
